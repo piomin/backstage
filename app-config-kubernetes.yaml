@@ -1,6 +1,6 @@
 app:
   title: Scaffolded Backstage App
-  baseUrl: http://localhost:3000
+  baseUrl: http://localhost:7007
 
 organization:
   name: piomin
@@ -22,7 +22,7 @@ backend:
     # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference
     # Default Helmet Content-Security-Policy values can be removed by setting the key to false
   cors:
-    origin: http://localhost:3000
+    origin: http://localhost:7007
     methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
     credentials: true
   # This is for local development only, it is not recommended to use this in production
@@ -53,14 +53,14 @@ proxy:
     allowedMethods: [ 'GET', 'POST' ]
     auth: "${SONARCLOUD_TOKEN}:"
   '/argocd/api':
-    target: https://localhost:8443/api/v1/
+    target: https://argo-cd-argocd-server.argocd.svc/api/v1/
     changeOrigin: true
     secure: false
     headers:
       Cookie:
         $env: ARGOCD_TOKEN
   '/prometheus/api':
-    target: http://localhost:9090/api/v1/
+    target: http://kube-prometheus-stack-prometheus.monitoring.svc:9090/api/v1/
 
 # Reference documentation http://backstage.io/docs/features/techdocs/configuration
 # Note: After experimenting with basic setup, use CI/CD to generate docs
@@ -80,7 +80,7 @@ auth:
     guest: {}
 
 scaffolder:
-  # see https://backstage.io/docs/features/software-templates/configuration for software template options
+# see https://backstage.io/docs/features/software-templates/configuration for software template options
 
 catalog:
   import:
@@ -130,11 +130,8 @@ kubernetes:
   clusterLocatorMethods:
     - type: 'config'
       clusters:
-        - url: ${K8S_URL}
+        - url: https://kubernetes.default.svc
           name: minikube
           authProvider: 'serviceAccount'
           skipTLSVerify: false
           skipMetricsLookup: true
-          serviceAccountToken: ${K8S_TOKEN}
-          dashboardApp: standard
-          caFile: '/Users/pminkows/.minikube/ca.crt'
